@@ -69,28 +69,17 @@ const UserController = {
   },
   getUserById: async (req, res) => {
     const { id } = req.params; // id користувача якого хочемо знайти
-    const userId = req.user.userId; // беремо користувача якого записали
 
     try {
       const user = await prisma.user.findUnique({
         // знахоидть унікальний запис
-        where: { id },
-        include: {
-          followers: true, // prisma це спрощує роботу з базою даних. followers список людей які підписані на цього користувача
-          following: true, // following список людей на яких підписаний цей користувач
-        },
+        where: { id: id },
       });
       if (!user) {
         return res.status(404).json({ error: "Користувач не знайдений" });
       }
-      const isFollowing = await prisma.follows.findFirst({
-        // isFollowing це логіка чи підписаний тепершній користувач на користувача якого ми шукаємо
-        where: {
-          AND: [{ followerId: userId }, { followingId: id }], // корисно для показу підписників користувача
-        },
-      });
 
-      res.json({ ...user, isFollowing: isFollowing });
+      res.json(user);
     } catch (error) {
       console.error("Get Current Error", error);
       res.status(500).json({ error: "Internal server error" });
