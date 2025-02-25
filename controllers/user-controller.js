@@ -141,18 +141,6 @@ const UserController = {
         where: {
           id: req.user.userId,
         },
-        include: {
-          followers: {
-            include: {
-              follower: true,
-            },
-          },
-          following: {
-            include: {
-              following: true,
-            },
-          },
-        },
       });
       if (!user) {
         return res.status(400).json({ error: "невдалося найти користувача" });
