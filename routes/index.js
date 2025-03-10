@@ -36,6 +36,8 @@ router.delete("/todo/:id", authenticateToken, ToDoController.removeTask);
 router.put("/todo/:id", authenticateToken, ToDoController.updateTask);
 //route toDO
 
+//test
+router.post("/decodetoken", UserController.decodeToken);
 router.get("/", (req, res) => {
   res.json({ message: "Welcome to the API!" });
 });

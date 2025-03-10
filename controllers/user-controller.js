@@ -141,5 +141,25 @@ const UserController = {
       res.status(500).json({ error: "Internal server error" });
     }
   },
+  decodeToken: async (req, res) => {
+    try {
+      const { token } = req.body;
+
+      const decoded = jwt.decode(token);
+      const user = await prisma.user.findUnique({
+        where: {
+          id: decoded.userId,
+        },
+      });
+      if (!user) {
+        return res.status(400).json({ error: "невдалося найти користувача" });
+      } else {
+        res.json(user);
+      }
+    } catch (err) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  },
 };
+
 module.exports = UserController;
