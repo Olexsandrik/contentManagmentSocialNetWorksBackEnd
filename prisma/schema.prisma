@@ -1,64 +1,64 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "mongodb"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
-
-
 model User {
-  id          String             @id @default(auto()) @map("_id") @db.ObjectId
-  email       String             @unique
-  password    String
-  name        String?
-  avatarUrl   String?
-  createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
-  bio         String?
-  location    String?
-  instagram   InstagramAccount?  @relation(fields: [instagramId], references: [idAccount])
+  id           Int               @id @default(autoincrement())
+  email        String            @unique
+  password     String
+  name         String?
+  avatarUrl    String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  bio          String?
+  location     String?
+  instagram    InstagramAccount? @relation(fields: [instagramId], references: [idAccount])
+  instagramId  Int?
 
-  instagramId String? @db.ObjectId
-
-  ToDo ToDo[]
+  todos        ToDo[]
 }
 
 model InstagramAccount {
-  idAccount   String    @id @default(auto()) @map("_id") @db.ObjectId
-  username    String    @unique
+  idAccount   Int     @id @default(autoincrement())
+  username    String  @unique
   profileUrl  String?
-  followers   Int     
-  following   Int       
-  totalLikes  Int      
-  
+  followers   Int
+  following   Int
+  totalLikes  Int
 
-  User User[]
+  users       User[]
 }
 
-
 model ToDo {
-  id         String     @id @default(auto()) @map("_id") @db.ObjectId
-  user       User       @relation(fields: [userId], references: [id])
-  userId     String     @db.ObjectId
+  id         Int      @id @default(autoincrement())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     Int
   date       DateTime
-  content    String     // Завдання (створене вручну або з AI)
-  completed  Boolean    @default(false)
-  createdAt  DateTime   @default(now())
-  chatGpt    ChatGPT?   @relation(fields: [chatGptId], references: [id])
-  chatGptId  String?    @db.ObjectId // null, якщо завдання не згенероване AI
+  content    String
+  completed  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  chatGpt    ChatGPT? @relation(fields: [chatGptId], references: [id])
+  chatGptId  Int?
 }
 
 model ChatGPT {
-  id       String   @id @default(auto()) @map("_id") @db.ObjectId
-  content  String   // Повідомлення від AI
-  todos    ToDo[]   // Завдання, створені з цього AI-відповіді
+  id      Int     @id @default(autoincrement())
+  content String
+  todos   ToDo[]
+}
+
+model InstagramProfile {
+  id                 Int      @id @default(autoincrement())
+  username           String
+  followersCount     Int
+  mediaCount         Int
+  profilePictureUrl  String
+  biography          String?
+  userId             Int
+  createdAt          DateTime @default(now())
 }
