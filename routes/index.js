@@ -1,5 +1,8 @@
 const express = require("express"); // фрейм для node.js
 const router = express.Router(); // обєкт для роботи маршрутів
+const passport = require("passport");
+const jwt = require("jsonwebtoken");
+require("../controllers/facebook-controller");
 
 const multer = require("multer"); //це бібліотека, яка допомагає приймати файли, що завантажуються клієнтом через HTTP-запит (наприклад, через форму на веб-сторінці).
 
@@ -36,9 +39,31 @@ router.delete("/todo/:id", authenticateToken, ToDoController.removeTask);
 router.put("/todo/:id", authenticateToken, ToDoController.updateTask);
 //route toDO
 
-//test
-router.post("/decodetoken", UserController.decodeToken);
-router.get("/", (req, res) => {
-  res.json({ message: "Welcome to the API!" });
-});
+router.get(
+  "/login/facebook",
+  passport.authenticate("facebook", {
+    scope: ["email", "public_profile", "pages_show_list", "instagram_basic"],
+    session: false,
+  })
+);
+
+router.get(
+  "/login/facebook/callback",
+  passport.authenticate("facebook", {
+    failureRedirect: "/login-failure",
+    session: false,
+  }),
+  async (req, res) => {
+    if (!req.user) {
+      return res.redirect(`${process.env.CLIENT_URL}/login-failure`);
+    }
+
+    const token = jwt.sign({ userId: req.user.id }, process.env.SECRET_KEY, {
+      expiresIn: "7d",
+    });
+
+    res.redirect(`${process.env.CLIENT_URL}/login/success?token=${token}`);
+  }
+);
+
 module.exports = router;

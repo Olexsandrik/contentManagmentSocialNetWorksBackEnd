@@ -8,31 +8,34 @@ datasource db {
 }
 
 model User {
-  id           Int               @id @default(autoincrement())
-  email        String            @unique
-  password     String
-  name         String?
-  avatarUrl    String?
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
-  bio          String?
-  location     String?
-  instagram    InstagramAccount? @relation(fields: [instagramId], references: [idAccount])
-  instagramId  Int?
-
-  todos        ToDo[]
+  id          Int       @id @default(autoincrement())
+  email       String?   @unique
+  name        String?
+  password    String?
+  provider    String?
+  accountId   String?
+  avatarUrl   String?   @db.Text
+  createdAt   DateTime  @default(now())
+  ToDo        ToDo[]
+  info        Info?
+  infoData    InfoDataSocial[]  
+}
+model InfoDataSocial {
+  id                Int      @id @default(autoincrement())
+  userId            Int
+  user              User     @relation(fields: [userId], references: [id])
+  provider          String
+  followersCount    Int
+  mediaCount        Int
+  likesCount        Int
+  engagementRate    Float?
+  profileUsername   String
+  profilePictureUrl String
+  createdAt         DateTime @default(now())
 }
 
-model InstagramAccount {
-  idAccount   Int     @id @default(autoincrement())
-  username    String  @unique
-  profileUrl  String?
-  followers   Int
-  following   Int
-  totalLikes  Int
 
-  users       User[]
-}
+
 
 model ToDo {
   id         Int      @id @default(autoincrement())
@@ -52,13 +55,17 @@ model ChatGPT {
   todos   ToDo[]
 }
 
-model InstagramProfile {
-  id                 Int      @id @default(autoincrement())
-  username           String
-  followersCount     Int
-  mediaCount         Int
-  profilePictureUrl  String
-  biography          String?
-  userId             Int
-  createdAt          DateTime @default(now())
+
+
+model Info {
+  id              Int      @id @default(autoincrement())
+  user            User     @relation(fields: [userId], references: [id])
+  userId          Int      @unique
+  platform        String
+  username        String
+  followers       Int
+  following       Int
+  bio             String?
+  profilePicture  String?
+  mediaCount      Int
 }
