@@ -1,9 +1,7 @@
 const passport = require("passport");
 const FacebookStrategy = require("passport-facebook").Strategy;
 const { prisma } = require("../prisma/prisma-client");
-const {
-  handleInstagramInfoAfterAuth,
-} = require("../controllers/facebook-controller");
+const { fetchInstagramDataAfterLogin } = require("./instagram-controller.js");
 
 require("dotenv").config();
 
@@ -17,6 +15,7 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
+        console.log("Access Token:", accessToken);
         const existingUser = await prisma.user.findFirst({
           where: {
             accountId: profile.id,
@@ -25,7 +24,7 @@ passport.use(
         });
 
         if (existingUser) return done(null, existingUser);
-
+        await fetchInstagramDataAfterLogin(existingUser.id, accessToken);
         const newUser = await prisma.user.create({
           data: {
             accountId: profile.id,
@@ -35,7 +34,14 @@ passport.use(
             provider: "facebook",
           },
         });
-        await handleInstagramInfoAfterAuth(newUser.id, accessToken);
+
+        if (accessToken) {
+          console.log("Fetching Instagram data...");
+          await fetchInstagramDataAfterLogin(newUser.id, accessToken);
+        } else {
+          console.log("No access token received.");
+        }
+
         return done(null, newUser);
       } catch (err) {
         console.error("Facebook auth error:", err);

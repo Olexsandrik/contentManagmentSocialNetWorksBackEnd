@@ -8,18 +8,22 @@ datasource db {
 }
 
 model User {
-  id          Int       @id @default(autoincrement())
-  email       String?   @unique
-  name        String?
-  password    String?
-  provider    String?
-  accountId   String?
-  avatarUrl   String?   @db.Text
-  createdAt   DateTime  @default(now())
-  ToDo        ToDo[]
-  info        Info?
-  infoData    InfoDataSocial[]  
+  id              Int                @id @default(autoincrement())
+  email           String?            @unique
+  name            String?
+  password        String?
+  provider        String?
+  accountId       String?
+  avatarUrl       String?            @db.Text
+  createdAt       DateTime           @default(now())
+  ToDo            ToDo[]
+  info            Info?
+  infoData        InfoDataSocial[]
+  instagramPosts  InstagramPost[]    
+  Analytics       Analytics?
+  
 }
+
 model InfoDataSocial {
   id                Int      @id @default(autoincrement())
   userId            Int
@@ -34,8 +38,32 @@ model InfoDataSocial {
   createdAt         DateTime @default(now())
 }
 
+model InstagramPost {
+  id             String              @id @default(uuid())
+  user           User                @relation(fields: [userId], references: [id])
+  userId         Int                 // 👈 пов'язано з User.id
+  postId         String              @unique // ID з Instagram Graph API
+  caption        String?             // текст поста
+  mediaType      String              // "IMAGE", "VIDEO", "CAROUSEL"
+  mediaUrl       String              // посилання на зображення/відео
+  permalink      String              // посилання на пост в Instagram
+  timestamp      DateTime            
+  likeCount      Int?             
+  commentsCount  Int?                
+  comments       InstagramComment[] 
+  createdAt      DateTime            @default(now())
+}
 
-
+model InstagramComment {
+  id         String         @id @default(uuid())
+  post       InstagramPost  @relation(fields: [postId], references: [postId])
+  postId     String
+  commentId  String         @unique 
+  text       String         
+  username   String        
+  timestamp  DateTime      
+  createdAt  DateTime       @default(now())
+}
 
 model ToDo {
   id         Int      @id @default(autoincrement())
@@ -55,8 +83,6 @@ model ChatGPT {
   todos   ToDo[]
 }
 
-
-
 model Info {
   id              Int      @id @default(autoincrement())
   user            User     @relation(fields: [userId], references: [id])
@@ -69,3 +95,15 @@ model Info {
   profilePicture  String?
   mediaCount      Int
 }
+
+model Analytics {
+  id             Int      @id @default(autoincrement())
+  userId         Int      @unique
+  user           User     @relation(fields: [userId], references: [id])
+  totalLikes     Int      @default(0)  // Загальна кількість лайків
+  totalComments  Int      @default(0)  // Загальна кількість коментарів
+  engagementRate Float?               // (лайки + коменти) / підписники
+  bestPostingTime String?             // Оптимальний час для постів
+  createdAt      DateTime @default(now())
+}
+

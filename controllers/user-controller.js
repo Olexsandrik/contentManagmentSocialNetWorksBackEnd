@@ -9,6 +9,7 @@ const Jdenticon = require("jdenticon");
 const UserController = {
   register: async (req, res) => {
     // req запит res - response
+
     const { email, password, name } = req.body;
 
     if (!email || !password || !name) {
@@ -44,7 +45,7 @@ const UserController = {
   },
   login: async (req, res) => {
     const { email, password } = req.body;
-
+    console.log("1");
     if (!email || !password) {
       return res.status(400).json({ error: "Всі поля обовязкові" });
     }

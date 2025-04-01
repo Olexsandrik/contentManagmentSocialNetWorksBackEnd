@@ -4,15 +4,11 @@ const path = require("path"); // модуль для роботи з шляха�
 const cookieParser = require("cookie-parser");
 const bodyparser = require("body-parser");
 const logger = require("morgan"); // використовується для логування запитів
-require('./controllers/faceboolStrategy.js');
+require("./controllers/facebookStrategy.js");
 const fs = require("fs");
 const app = express();
 require("dotenv").config(); //Завантажує конфігурацію з .env файлу, наприклад секретні ключі чи налаштування.
 const cors = require("cors");
-
-
-
-
 
 // view engine setup
 app.use(bodyparser.json());

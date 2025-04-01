@@ -2,7 +2,7 @@ const express = require("express"); // фрейм для node.js
 const router = express.Router(); // обєкт для роботи маршрутів
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
-require("../controllers/facebook-controller");
+require("../controllers/instagram-controller");
 
 const multer = require("multer"); //це бібліотека, яка допомагає приймати файли, що завантажуються клієнтом через HTTP-запит (наприклад, через форму на веб-сторінці).
 
@@ -42,7 +42,15 @@ router.put("/todo/:id", authenticateToken, ToDoController.updateTask);
 router.get(
   "/login/facebook",
   passport.authenticate("facebook", {
-    scope: ["email", "public_profile", "pages_show_list", "instagram_basic"],
+    scope: [
+      "email",
+      "pages_show_list",
+      "pages_read_engagement",
+      "instagram_basic",
+      "instagram_manage_insights",
+      "instagram_manage_comments",
+    ],
+
     session: false,
   })
 );
