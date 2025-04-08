@@ -8,102 +8,76 @@ datasource db {
 }
 
 model User {
-  id              Int                @id @default(autoincrement())
-  email           String?            @unique
-  name            String?
-  password        String?
-  provider        String?
-  accountId       String?
-  avatarUrl       String?            @db.Text
-  createdAt       DateTime           @default(now())
-  ToDo            ToDo[]
-  info            Info?
-  infoData        InfoDataSocial[]
-  instagramPosts  InstagramPost[]    
-  Analytics       Analytics?
-  
+  id         Int                 @id @default(autoincrement())
+  email      String?             @unique
+  name        String
+  password   String?
+  provider   String?
+  avatarUrl  String?             @db.Text
+  role       String?
+  createdAt  DateTime            @default(now())
+  accountId   String?
+  posts      SocialMediaPost[]
+  reviews    Reviews[]
+  tasks      Task[]
+  analytics  AnalyticsAI[]
 }
 
-model InfoDataSocial {
-  id                Int      @id @default(autoincrement())
-  userId            Int
-  user              User     @relation(fields: [userId], references: [id])
-  provider          String
-  followersCount    Int
-  mediaCount        Int
-  likesCount        Int
-  engagementRate    Float?
-  profileUsername   String
-  profilePictureUrl String
-  createdAt         DateTime @default(now())
+model SocialMediaPost {
+  id             String                 @id @default(uuid())
+  userId         Int
+  user           User                   @relation(fields: [userId], references: [id])
+  postId         BigInt                 @unique
+  caption        String?
+  mediaType      String
+  mediaUrl       String                 @db.Text
+  permalink      String
+  timestamp      DateTime
+  likeCount      Int
+  commentsCount  Int
+  createdAt      DateTime              @default(now())
+  platform       String
+  comments       SocialMediaComment[]
 }
 
-model InstagramPost {
-  id             String              @id @default(uuid())
-  user           User                @relation(fields: [userId], references: [id])
-  userId         Int                 // 👈 пов'язано з User.id
-  postId         String              @unique // ID з Instagram Graph API
-  caption        String?             // текст поста
-  mediaType      String              // "IMAGE", "VIDEO", "CAROUSEL"
-  mediaUrl       String              // посилання на зображення/відео
-  permalink      String              // посилання на пост в Instagram
-  timestamp      DateTime            
-  likeCount      Int?             
-  commentsCount  Int?                
-  comments       InstagramComment[] 
-  createdAt      DateTime            @default(now())
+model SocialMediaComment {
+  id         String             @id @default(uuid())
+  postId     BigInt
+  post       SocialMediaPost    @relation(fields: [postId], references: [postId])
+  commentId  BigInt             @unique
+  text       String
+  username   String
+  timestamp  DateTime
+  createdAt  DateTime           @default(now())
 }
 
-model InstagramComment {
-  id         String         @id @default(uuid())
-  post       InstagramPost  @relation(fields: [postId], references: [postId])
-  postId     String
-  commentId  String         @unique 
-  text       String         
-  username   String        
-  timestamp  DateTime      
-  createdAt  DateTime       @default(now())
+model Reviews {
+  id            String     @id @default(uuid())
+  userId        Int
+  user          User       @relation(fields: [userId], references: [id])
+  typeOfReviews String
+  topic         String
+  messages      String
+  createdAt     DateTime   @default(now())
 }
 
-model ToDo {
-  id         Int      @id @default(autoincrement())
-  user       User     @relation(fields: [userId], references: [id])
+model Task {
+  id         String     @id @default(uuid())
   userId     Int
-  date       DateTime
-  content    String
-  completed  Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  chatGpt    ChatGPT? @relation(fields: [chatGptId], references: [id])
-  chatGptId  Int?
+  user       User       @relation(fields: [userId], references: [id])
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  name       String
+  priority   String
 }
 
-model ChatGPT {
-  id      Int     @id @default(autoincrement())
-  content String
-  todos   ToDo[]
+model AnalyticsAI {
+  id         String     @id @default(uuid())
+  userId     Int
+  user       User       @relation(fields: [userId], references: [id])
+  dataType   String
+  prompt     String
+  inputData  Json
+  result     String
+  createdAt  DateTime   @default(now())
 }
-
-model Info {
-  id              Int      @id @default(autoincrement())
-  user            User     @relation(fields: [userId], references: [id])
-  userId          Int      @unique
-  platform        String
-  username        String
-  followers       Int
-  following       Int
-  bio             String?
-  profilePicture  String?
-  mediaCount      Int
-}
-
-model Analytics {
-  id             Int      @id @default(autoincrement())
-  userId         Int      @unique
-  user           User     @relation(fields: [userId], references: [id])
-  totalLikes     Int      @default(0)  // Загальна кількість лайків
-  totalComments  Int      @default(0)  // Загальна кількість коментарів
-  engagementRate Float?               // (лайки + коменти) / підписники
-  bestPostingTime String?             // Оптимальний час для постів
-  createdAt      DateTime @default(now())
-}
-

@@ -88,13 +88,13 @@ const UserController = {
   },
   updateUser: async (req, res) => {
     const { id } = req.params;
-    const { email, name, dateOfBirth, bio, location } = req.body;
-
+    const { email, name } = req.body;
+    const mainId = parseInt(id, 10);
     let filePath;
     if (req.file && req.file.path) {
       filePath = req.file.path;
     }
-    if (id !== req.user.userId) {
+    if (mainId !== req.user.userId) {
       return res.status(403).json({ error: "немає доступу" });
     }
     try {
@@ -102,20 +102,17 @@ const UserController = {
         const existingUser = await prisma.user.findFirst({
           where: { email: email },
         });
-        if (existingUser && existingUser.id !== id) {
+        if (existingUser && existingUser.id !== mainId) {
           return res.status(400).json({ error: "пошта вже використовуєтсья" });
         }
       }
 
       const user = await prisma.user.update({
-        where: { id },
+        where: { id: mainId },
         data: {
           email: email || undefined,
           name: name || undefined,
           avatarUrl: filePath ? `/${filePath}` : undefined,
-          dateOfBirth: dateOfBirth || undefined,
-          bio: bio || undefined,
-          location: location || undefined,
         },
       });
 

@@ -3,12 +3,13 @@ const { prisma } = require("../prisma/prisma-client");
 
 const fetchInstagramDataAfterLogin = async (userId, accessToken) => {
   try {
-    console.log("Fetching Facebook pages...");
+    // Отримуємо список сторінок Facebook
     const pagesRes = await axios.get(
-      `https://graph.facebook.com/v22.0/me/accounts?access_token=${accessToken}`
+      `${process.env.FACEBOOK_BASE_URL}/me/accounts?access_token=${accessToken}`
     );
 
     const pages = pagesRes.data.data;
+
     if (!pages || pages.length === 0) {
       console.log("No Facebook Pages found — possible reasons:");
       console.log("- You did not create a Page on Facebook");
@@ -22,30 +23,36 @@ const fetchInstagramDataAfterLogin = async (userId, accessToken) => {
     const pageId = page.id;
 
     const pageInfoRes = await axios.get(
-      `https://graph.facebook.com/v22.0/${pageId}?fields=instagram_business_account&access_token=${pageAccessToken}`
+      `${process.env.FACEBOOK_BASE_URL}/${pageId}?fields=instagram_business_account&access_token=${pageAccessToken}`
     );
 
-    const igUserId = pageInfoRes.data.instagram_business_account.id;
+    const igUserId = pageInfoRes.data.instagram_business_account?.id;
+
     if (!igUserId) {
       console.log("Instagram Business Account not linked to Page.");
       return;
     }
 
+    // Отримуємо список постів з Instagram
     const mediaRes = await axios.get(
-      `https://graph.facebook.com/v22.0/${igUserId}/media`,
+      `${process.env.FACEBOOK_BASE_URL}/${igUserId}/media`,
       {
         params: {
-          access_token: pageAccessToken,
           fields:
             "id,caption,media_type,media_url,permalink,timestamp,like_count,comments_count",
+          access_token: pageAccessToken,
         },
       }
     );
 
     const posts = mediaRes.data.data;
+    console.log(posts);
+    if (!posts || posts.length === 0) {
+      return;
+    }
 
     for (const post of posts) {
-      await prisma.instagramPost.upsert({
+      await prisma.socialMediaPost.upsert({
         where: { postId: post.id },
         update: {
           caption: post.caption,
@@ -55,10 +62,10 @@ const fetchInstagramDataAfterLogin = async (userId, accessToken) => {
           timestamp: new Date(post.timestamp),
           likeCount: post.like_count,
           commentsCount: post.comments_count,
+          platform: "Instagram",
         },
         create: {
-          userId: userId,
-          platform: "instagram",
+          userId,
           postId: post.id,
           caption: post.caption,
           mediaType: post.media_type,
@@ -67,48 +74,45 @@ const fetchInstagramDataAfterLogin = async (userId, accessToken) => {
           timestamp: new Date(post.timestamp),
           likeCount: post.like_count,
           commentsCount: post.comments_count,
+          platform: "Instagram",
         },
       });
 
+      // Отримуємо коментарі для кожного поста
       const commentsRes = await axios.get(
-        `https://graph.facebook.com/v22.0/${post.id}/comments`,
+        `${process.env.FACEBOOK_BASE_URL}/${post.id}/comments`,
         {
           params: {
+            fields: "id,text,username,timestamp",
             access_token: pageAccessToken,
-            limit: 3,
           },
         }
       );
 
       const comments = commentsRes.data.data;
 
-      console.log(comments);
-      for (const comment of comments) {
-        await prisma.instagramComment.upsert({
-          where: { commentId: comment.id },
-          update: {
-            text: comment.text,
-            username: comment.username,
-            timestamp: new Date(comment.timestamp),
-          },
-          create: {
-            postId: post.id,
-            commentId: comment.id,
-            text: comment.text,
-            username: comment.username,
-            timestamp: new Date(comment.timestamp),
-          },
-        });
+      if (comments && comments.length > 0) {
+        for (const comment of comments) {
+          await prisma.socialMediaComment.upsert({
+            where: { commentId: comment.id },
+            update: {
+              text: comment.text,
+              username: comment.username,
+              timestamp: new Date(comment.timestamp),
+            },
+            create: {
+              postId: post.id,
+              commentId: comment.id,
+              text: comment.text,
+              username: comment.username,
+              timestamp: new Date(comment.timestamp),
+            },
+          });
+        }
       }
-      console.log(
-        "Instagram Business Account:",
-        pageInfoRes.data.instagram_business_account
-      );
     }
-
-    console.log("Instagram posts and comments saved successfully.");
   } catch (error) {
-    console.error("Error fetching Instagram data:", error);
+    console.error("Error fetching Instagram data:", error.message);
   }
 };
 

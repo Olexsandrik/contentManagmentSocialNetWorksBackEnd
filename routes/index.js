@@ -10,13 +10,19 @@ const authenticateToken = require("../middleware/auth");
 const UserController = require("../controllers/user-controller");
 const ToDoController = require("../controllers/todo-controller");
 const uploadDestination = "uploads";
+const path = require("path"); // 👈 додано
+const reviewsController = require("../controllers/reviews-controller");
 
 // показуємо  де зберігати файли
 
 const storage = multer.diskStorage({
-  destination: uploadDestination,
+  destination: function (req, file, cb) {
+    cb(null, uploadDestination);
+  },
   filename: function (req, file, cb) {
-    cb(null, file.originalname); //
+    const ext = path.extname(file.originalname); // отримуємо розширення
+    const uniqueName = Date.now() + "-" + Math.round(Math.random() * 1e9) + ext;
+    cb(null, uniqueName);
   },
 });
 
@@ -38,6 +44,12 @@ router.get("/todo/:id", authenticateToken, ToDoController.getTask);
 router.delete("/todo/:id", authenticateToken, ToDoController.removeTask);
 router.put("/todo/:id", authenticateToken, ToDoController.updateTask);
 //route toDO
+
+//Reviews
+router.get("/reviews-paginations", reviewsController.getPaginationsReviws);
+router.post("/reviews", authenticateToken, reviewsController.postReviews);
+router.get("/getreviews", reviewsController.getAllReviews);
+//Reviews
 
 router.get(
   "/login/facebook",
