@@ -1,7 +1,6 @@
 const { prisma } = require("../prisma/prisma-client");
 
 const reviewsController = {
-
   postReviews: async (req, res) => {
     try {
       const { messages, typeOfReviews, topic } = req.body;

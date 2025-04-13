@@ -1,7 +1,9 @@
 const passport = require("passport");
 const FacebookStrategy = require("passport-facebook").Strategy;
 const { prisma } = require("../prisma/prisma-client");
-const { fetchInstagramDataAfterLogin } = require("./instagram-controller");
+const {
+  fetchInstagramDataAfterLogin,
+} = require("../controllers/instagram-controller");
 
 require("dotenv").config();
 

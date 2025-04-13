@@ -78,7 +78,7 @@ const fetchInstagramDataAfterLogin = async (userId, accessToken) => {
         },
       });
 
-      // Отримуємо коментарі для кожного поста
+    
       const commentsRes = await axios.get(
         `${process.env.FACEBOOK_BASE_URL}/${post.id}/comments`,
         {

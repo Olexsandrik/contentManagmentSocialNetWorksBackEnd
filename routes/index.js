@@ -9,11 +9,12 @@ const multer = require("multer"); //це бібліотека, яка допом
 const authenticateToken = require("../middleware/auth");
 const UserController = require("../controllers/user-controller");
 const ToDoController = require("../controllers/todo-controller");
-const uploadDestination = "uploads";
-const path = require("path"); // 👈 додано
 const reviewsController = require("../controllers/reviews-controller");
-
-// показуємо  де зберігати файли
+const instagramDataController = require("../controllers/instagramData-controller");
+const getAdviceFromChatGPT = require("../controllers/chatgpt-controller");
+const analyticsAI = require("../controllers/analyticsAI-controller");
+const uploadDestination = "uploads";
+const path = require("path");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -50,6 +51,19 @@ router.get("/reviews-paginations", reviewsController.getPaginationsReviws);
 router.post("/reviews", authenticateToken, reviewsController.postReviews);
 router.get("/getreviews", reviewsController.getAllReviews);
 //Reviews
+//Data from  instagram
+router.get(
+  "/instagram-data",
+  authenticateToken,
+  instagramDataController.reciveDataInstagram
+);
+//Data from  instagram
+
+//AI controller
+router.post("/advice", authenticateToken, getAdviceFromChatGPT.adviceChatGpt);
+router.get("/prompt", authenticateToken, analyticsAI.getMessage);
+router.delete("/prompt/:id", authenticateToken, analyticsAI.removeDataAI);
+//AI controller
 
 router.get(
   "/login/facebook",

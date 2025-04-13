@@ -27,7 +27,7 @@ model SocialMediaPost {
   id             String                 @id @default(uuid())
   userId         Int
   user           User                   @relation(fields: [userId], references: [id])
-  postId         BigInt                 @unique
+  postId       String               @unique
   caption        String?
   mediaType      String
   mediaUrl       String                 @db.Text
@@ -42,14 +42,15 @@ model SocialMediaPost {
 
 model SocialMediaComment {
   id         String             @id @default(uuid())
-  postId     BigInt
+  postId     String
   post       SocialMediaPost    @relation(fields: [postId], references: [postId])
-  commentId  BigInt             @unique
+  commentId  String             @unique
   text       String
   username   String
   timestamp  DateTime
   createdAt  DateTime           @default(now())
 }
+
 
 model Reviews {
   id            String     @id @default(uuid())
@@ -76,8 +77,10 @@ model AnalyticsAI {
   userId     Int
   user       User       @relation(fields: [userId], references: [id])
   dataType   String
-  prompt     String
+  prompt    String   @db.Text
+  customPrompt  String   @db.Text 
   inputData  Json
-  result     String
+  result    String   @db.Text  
   createdAt  DateTime   @default(now())
+
 }
