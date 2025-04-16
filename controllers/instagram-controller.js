@@ -1,6 +1,6 @@
 const axios = require("axios");
 const { prisma } = require("../prisma/prisma-client");
-
+const { downloadVideoFile } = require("./download-controller.cjs");
 const fetchInstagramDataAfterLogin = async (userId, accessToken) => {
   try {
     // Отримуємо список сторінок Facebook
@@ -52,12 +52,24 @@ const fetchInstagramDataAfterLogin = async (userId, accessToken) => {
     }
 
     for (const post of posts) {
+      let localMediaUrl = null;
+
+      try {
+        if (post.media_type === "VIDEO") {
+          localMediaUrl = await downloadVideoFile(post.media_url);
+        } else {
+          localMediaUrl = post.media_url;
+        }
+      } catch (err) {
+        console.error("Помилка при завантаженні медіа:", err.message);
+        localMediaUrl = post.media_url;
+      }
       await prisma.socialMediaPost.upsert({
         where: { postId: post.id },
         update: {
           caption: post.caption,
           mediaType: post.media_type,
-          mediaUrl: post.media_url,
+          mediaUrl: localMediaUrl,
           permalink: post.permalink,
           timestamp: new Date(post.timestamp),
           likeCount: post.like_count,
@@ -78,7 +90,6 @@ const fetchInstagramDataAfterLogin = async (userId, accessToken) => {
         },
       });
 
-    
       const commentsRes = await axios.get(
         `${process.env.FACEBOOK_BASE_URL}/${post.id}/comments`,
         {

@@ -61,7 +61,7 @@ router.get(
 
 //AI controller
 router.post("/advice", authenticateToken, getAdviceFromChatGPT.adviceChatGpt);
-router.get("/prompt", authenticateToken, analyticsAI.getMessage);
+router.get("/prompt/:userId", authenticateToken, analyticsAI.getMessage);
 router.delete("/prompt/:id", authenticateToken, analyticsAI.removeDataAI);
 //AI controller
 

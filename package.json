@@ -17,6 +17,7 @@
     "debug": "~2.6.9",
     "dotenv": "^16.4.7",
     "express": "~4.16.1",
+    "file-type": "^16.5.4",
     "fs": "^0.0.1-security",
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",

@@ -3,8 +3,7 @@ const { prisma } = require("../prisma/prisma-client");
 const analyticsAI = {
   getMessage: async (req, res) => {
     try {
-      const { userId } = req.query;
-
+      const { userId } = req.params;
       if (!userId || isNaN(userId)) {
         return res
           .status(400)
@@ -20,10 +19,10 @@ const analyticsAI = {
           customPrompt: true,
         },
         orderBy: {
-          createdAt: "desc",
+          createdAt: "asc",
         },
       });
-      console.log(createMessages);
+
       res.json(createMessages);
     } catch (error) {
       console.error("GET analytics error:", error);
@@ -38,6 +37,7 @@ const analyticsAI = {
         where: {
           userId,
         },
+        
       });
 
       res.json({ removeData });

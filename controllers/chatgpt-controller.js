@@ -48,11 +48,12 @@ const getAdviceFromChatGPT = {
       `;
 
       const prompt = customPrompt
-        ? `${basePrompt}\n\nДодаткові вказівки користувача: ${customPrompt}`
+        ? `${basePrompt}\n\nДодаткові вказівки користувача: ${customPrompt} твоя ціль ще відпрвідати користувачеві на повідомлення які він додатково задає`
         : basePrompt;
 
       const response = await openai.chat.completions.create({
         model: "gpt-3.5-turbo",
+
         messages: [
           {
             role: "system",
@@ -76,7 +77,7 @@ const getAdviceFromChatGPT = {
         },
       });
 
-      res.json({ advice: result });
+      res.json({ role: "assistant", content: result });
     } catch (error) {
       console.error(error);
       res

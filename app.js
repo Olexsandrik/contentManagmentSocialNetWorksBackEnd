@@ -25,6 +25,9 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // статичні файли із папки  'upload'
 app.use("/uploads", express.static("uploads"));
+
+app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
+
 app.use("/server", require("./routes/index.js"));
 
 if (!fs.existsSync("uploads")) {
