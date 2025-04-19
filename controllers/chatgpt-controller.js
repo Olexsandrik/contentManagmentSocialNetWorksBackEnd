@@ -58,6 +58,7 @@ const getAdviceFromChatGPT = {
           {
             role: "system",
             content: "Ти — професіональний аналітик соціальних мереж.",
+            
           },
           { role: "user", content: prompt },
         ],
