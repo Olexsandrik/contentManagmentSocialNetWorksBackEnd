@@ -46,7 +46,7 @@ const fetchInstagramDataAfterLogin = async (userId, accessToken) => {
     );
 
     const posts = mediaRes.data.data;
-    console.log(posts);
+
     if (!posts || posts.length === 0) {
       return;
     }

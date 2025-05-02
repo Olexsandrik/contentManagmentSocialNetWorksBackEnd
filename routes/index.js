@@ -8,7 +8,7 @@ const multer = require("multer"); //це бібліотека, яка допом
 
 const authenticateToken = require("../middleware/auth");
 const UserController = require("../controllers/user-controller");
-const ToDoController = require("../controllers/todo-controller");
+const ToDoController = require("../controllers/taskmanager-controller");
 const reviewsController = require("../controllers/reviews-controller");
 const instagramDataController = require("../controllers/instagramData-controller");
 const getAdviceFromChatGPT = require("../controllers/chatgpt-controller");
@@ -41,9 +41,10 @@ router.put(
 );
 // route toDo
 router.post("/todo", authenticateToken, ToDoController.addTask);
-router.get("/todo/:id", authenticateToken, ToDoController.getTask);
+router.get("/todoget", authenticateToken, ToDoController.getTask);
 router.delete("/todo/:id", authenticateToken, ToDoController.removeTask);
 router.put("/todo/:id", authenticateToken, ToDoController.updateTask);
+router.patch("/todo/:id/desc", authenticateToken, ToDoController.updateTask);
 //route toDO
 
 //Reviews
@@ -57,6 +58,12 @@ router.get(
   authenticateToken,
   instagramDataController.reciveDataInstagram
 );
+router.get(
+  "/instagramdata-pagination",
+  authenticateToken,
+  instagramDataController.reciveDataInstagramPagination
+);
+
 //Data from  instagram
 
 //AI controller

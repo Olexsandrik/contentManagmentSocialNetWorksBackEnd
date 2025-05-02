@@ -67,9 +67,10 @@ model Task {
   userId     Int
   user       User       @relation(fields: [userId], references: [id])
   createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  date       DateTime 
   name       String
-  priority   String
+  priority   PriorityTask
+  desc       String?
 }
 
 model AnalyticsAI {
@@ -83,4 +84,11 @@ model AnalyticsAI {
   result    String   @db.Text  
   createdAt  DateTime   @default(now())
 
+
+}
+
+enum PriorityTask {
+  HIGH_PRIORITY
+  IN_PROGRESS
+  COMPLETED
 }
