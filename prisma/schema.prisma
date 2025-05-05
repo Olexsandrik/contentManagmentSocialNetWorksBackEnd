@@ -69,7 +69,7 @@ model Task {
   createdAt  DateTime   @default(now())
   date       DateTime 
   name       String
-  priority   PriorityTask
+  priority   String
   desc       String?
 }
 
@@ -87,8 +87,3 @@ model AnalyticsAI {
 
 }
 
-enum PriorityTask {
-  HIGH_PRIORITY
-  IN_PROGRESS
-  COMPLETED
-}

@@ -1,3 +1,4 @@
+const { PriorityTask } = require("@prisma/client");
 const { prisma } = require("../prisma/prisma-client");
 
 const ToDoController = {
@@ -68,6 +69,8 @@ const ToDoController = {
         return res.status(400).json({ message: "Завдання не існує" });
       }
 
+      console.log(name, priority, date, desc);
+
       const updatetask = await prisma.task.update({
         where: { id },
         data: { name, priority, date, desc },
@@ -80,27 +83,25 @@ const ToDoController = {
     }
   },
 
-  updateDesc: async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { desc } = req.body;
+  getAllTaskUser: async (req, res) => {
+    const userId = req.user.userId;
 
-      if (!id) {
-        return res.status(400).json({ message: "Завдання не існує" });
-      }
-
-      const updatetask = await prisma.task.update({
-        where: { id },
-        data: { desc },
-      });
-
-      res.status(200).json(updatetask);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: "server error" });
+    if (!userId) {
+      return res.status(400).json({ message: "користувача з таки id немає" });
     }
-  },
 
+    const findTask = await prisma.task.findMany({
+      where: {
+        userId,
+      },
+    });
+
+    if (!findTask) {
+      return res.status(400).json({ message: "завдання не знайдені" });
+    }
+
+    res.status(201).json(findTask);
+  },
   removeTask: async (req, res) => {
     try {
       const { id } = req.params;

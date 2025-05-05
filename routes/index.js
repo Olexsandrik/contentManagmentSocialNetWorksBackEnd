@@ -45,6 +45,13 @@ router.get("/todoget", authenticateToken, ToDoController.getTask);
 router.delete("/todo/:id", authenticateToken, ToDoController.removeTask);
 router.put("/todo/:id", authenticateToken, ToDoController.updateTask);
 router.patch("/todo/:id/desc", authenticateToken, ToDoController.updateTask);
+
+router.get("/todoall", authenticateToken, ToDoController.getAllTaskUser);
+router.patch(
+  "/todo/:id/priority",
+  authenticateToken,
+  ToDoController.updateTask
+);
 //route toDO
 
 //Reviews
