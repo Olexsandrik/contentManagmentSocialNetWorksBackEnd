@@ -84,6 +84,5 @@ model AnalyticsAI {
   result    String   @db.Text  
   createdAt  DateTime   @default(now())
 
-
 }
 

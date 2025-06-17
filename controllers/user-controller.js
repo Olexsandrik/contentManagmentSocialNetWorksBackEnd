@@ -8,8 +8,6 @@ const Jdenticon = require("jdenticon");
 
 const UserController = {
   register: async (req, res) => {
-    // req запит res - response
-
     const { email, password, name } = req.body;
 
     if (!email || !password || !name) {

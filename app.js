@@ -1,21 +1,21 @@
-const createError = require("http-errors"); // модуль для створення помилок
+const createError = require("http-errors");
 const express = require("express");
-const path = require("path"); // модуль для роботи з шляхами
+const path = require("path"); 
 const cookieParser = require("cookie-parser");
 const bodyparser = require("body-parser");
-const logger = require("morgan"); // використовується для логування запитів
+const logger = require("morgan");
 require("./libs/facebookStrategy.js");
 const fs = require("fs");
 const app = express();
-require("dotenv").config(); //Завантажує конфігурацію з .env файлу, наприклад секретні ключі чи налаштування.
+require("dotenv").config();
 const cors = require("cors");
 
 // view engine setup
 app.use(bodyparser.json());
 app.use(cors());
 app.use(bodyparser.urlencoded({ extended: false }));
-app.use(logger("dev")); // використовується для логування http запитів в консолі
-app.use(express.json()); // автоматично парсить дані з сервера
+app.use(logger("dev")); 
+app.use(express.json()); 
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 

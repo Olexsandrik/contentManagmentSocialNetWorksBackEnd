@@ -1,4 +1,3 @@
-const { PriorityTask } = require("@prisma/client");
 const { prisma } = require("../prisma/prisma-client");
 
 const ToDoController = {

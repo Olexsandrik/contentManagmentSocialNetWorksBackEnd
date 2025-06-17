@@ -70,6 +70,11 @@ router.get(
   authenticateToken,
   instagramDataController.reciveDataInstagramPagination
 );
+router.post(
+  "/instagram-reload",
+  authenticateToken,
+  instagramDataController.refreshInstagramData
+);
 
 //Data from  instagram
 

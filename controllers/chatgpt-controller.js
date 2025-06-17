@@ -24,45 +24,68 @@ const getAdviceFromChatGPT = {
           .status(404)
           .json({ error: "Користувач не має постів та коментарів" });
       }
-      const content = posts.map((post) => {
+      const content = posts.map((post, index) => {
         const comments =
           post.comments.length > 0
-            ? post.comments.map((c) => `- ${c.username}: ${c.text}`).join("\n")
-            : "Немає";
+            ? post.comments.map((c) => `  - ${c.username}: ${c.text}`).join("\n")
+            : "No comments";
 
         return `
-        ${post.caption ?? "Опис відсутній"}
-          ${post.platform}
-          кількість лайків та коментарів ${post.likeCount}, ${post.commentsCount}
-          Коментарі:
-          ${comments || "Немає коментраів"}
-          тип контенту: ${post.mediaType}
-          зображення aбо відео користувача: ${post.mediaUrl}} зроби опис по url
-          `;
+POST #${index + 1}:
+Caption: ${post.caption || "No caption"}
+Platform: ${post.platform}
+Media Type: ${post.mediaType}
+Media URL: ${post.mediaUrl}
+Engagement: ${post.likeCount} likes, ${post.commentsCount} comments
+Posted: ${post.timestamp}
+Comments:
+${comments}
+---`;
       });
 
       const basePrompt = `
-      Користувач публікує наступний контент: ${content} 
-      На основі цих даних, запропонуй поради як покращити залучення аудиторії та якість контенту. 
-      Для тесту скажи які дані ти бачиш і опиши фото чи відео яке надано в стилі посилання яке там є.
-      `;
+You are analyzing social media content performance for a Ukrainian user. Here is their content data:
+
+${content.join("\n")}
+
+ANALYSIS REQUIREMENTS:
+1. Analyze engagement patterns (likes, comments, content types)
+2. Identify top-performing content characteristics
+3. Provide specific improvement recommendations
+4. Suggest optimal posting strategies
+5. Analyze audience interaction from comments
+6. Recommend content themes and formats
+7. Provide hashtag and caption optimization tips
+
+IMPORTANT: 
+- Respond ONLY in Ukrainian language
+- Be specific and actionable in recommendations
+- Focus on Instagram best practices
+- Consider current social media trends
+- Provide measurable goals where possible
+`;
 
       const prompt = customPrompt
-        ? `${basePrompt}\n\nДодаткові вказівки користувача: ${customPrompt} твоя ціль ще відпрвідати користувачеві на повідомлення які він додатково задає`
+        ? `${basePrompt}\n\nADDITIONAL USER REQUEST: ${customPrompt}\n\nPlease address this specific request while maintaining the comprehensive analysis above. Respond in Ukrainian.`
         : basePrompt;
 
       const response = await openai.chat.completions.create({
         model: "gpt-3.5-turbo",
-
         messages: [
           {
             role: "system",
-            content: "Ти — професіональний аналітик соціальних мереж.",
-            
+            content: `You are an expert social media analyst and Instagram marketing strategist with 10+ years of experience. You specialize in:
+- Content performance analysis
+- Audience engagement optimization
+- Instagram algorithm understanding
+- Social media growth strategies
+- Data-driven marketing recommendations
+
+You analyze user data comprehensively and provide actionable insights. Always respond in fluent Ukrainian language with professional marketing terminology. Focus on measurable improvements and current Instagram best practices.`,
           },
           { role: "user", content: prompt },
         ],
-        temperature: 0.8,
+        temperature: 0.7,
       });
 
       const result = response.choices[0].message.content;
@@ -70,10 +93,22 @@ const getAdviceFromChatGPT = {
       await prisma.analyticsAI.create({
         data: {
           userId: userIdInt,
-          dataType: "content_advice",
-          prompt,
-          customPrompt,
-          inputData: posts,
+          dataType: "social_media_analysis",
+          prompt: basePrompt,
+          customPrompt: customPrompt || "Standard analysis",
+          inputData: {
+            totalPosts: posts.length,
+            totalEngagement: posts.reduce((sum, post) => sum + post.likeCount + post.commentsCount, 0),
+            contentTypes: [...new Set(posts.map(post => post.mediaType))],
+            analysisDate: new Date().toISOString(),
+            posts: posts.map(post => ({
+              id: post.id,
+              caption: post.caption,
+              mediaType: post.mediaType,
+              engagement: post.likeCount + post.commentsCount,
+              platform: post.platform
+            }))
+          },
           result,
         },
       });

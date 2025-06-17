@@ -4,16 +4,16 @@ const fs = require("fs");
 const https = require("https");
 const app = require("../app");
 const debug = require("debug")("project-main-1:server");
-
+const options = {
+  key: fs.readFileSync("./certs/localhost-key.pem"), // Шлях до ключа
+  cert: fs.readFileSync("./certs/localhost.pem"), // Шлях до сертифіката
+};
 // Завантажуємо порт
 const port = normalizePort(process.env.PORT || "3000");
 app.set("port", port);
 
 // Параметри для HTTPS
-const options = {
-  key: fs.readFileSync("./certs/localhost-key.pem"), // Шлях до ключа
-  cert: fs.readFileSync("./certs/localhost.pem"), // Шлях до сертифіката
-};
+
 // Створюємо HTTPS-сервер
 const server = https.createServer(options, app);
 

@@ -3,7 +3,7 @@ const { prisma } = require("../prisma/prisma-client");
 const { downloadVideoFile } = require("./download-controller.cjs");
 const fetchInstagramDataAfterLogin = async (userId, accessToken) => {
   try {
-    // Отримуємо список сторінок Facebook
+
     const pagesRes = await axios.get(
       `${process.env.FACEBOOK_BASE_URL}/me/accounts?access_token=${accessToken}`
     );
@@ -33,7 +33,7 @@ const fetchInstagramDataAfterLogin = async (userId, accessToken) => {
       return;
     }
 
-    // Отримуємо список постів з Instagram
+   
     const mediaRes = await axios.get(
       `${process.env.FACEBOOK_BASE_URL}/${igUserId}/media`,
       {
