@@ -28,8 +28,7 @@ passport.use(
         });
 
         if (existingUser) {
-          // Store access token for future use
-          instagramDataController.storeUserToken(existingUser.id, accessToken);
+    
           await fetchInstagramDataAfterLogin(existingUser.id, accessToken);
           return done(null, existingUser);
         }
@@ -44,8 +43,7 @@ passport.use(
           },
         });
 
-        // Store access token for future use
-        instagramDataController.storeUserToken(newUser.id, accessToken);
+       
         await fetchInstagramDataAfterLogin(newUser.id, accessToken);
 
         return done(null, newUser);

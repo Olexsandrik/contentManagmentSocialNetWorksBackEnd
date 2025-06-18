@@ -5,25 +5,26 @@ const { fetchInstagramDataAfterLogin } = require("./instagram-controller");
 const userTokens = new Map();
 
 const instagramDataController = {
-  // Store access token for user (called during login)
-  storeUserToken: (userId, accessToken) => {
-    userTokens.set(userId, accessToken);
-    console.log(`Access token stored for user ${userId} (type: ${typeof userId})`);
-  },
+
 
   refreshInstagramData: async (req, res) => {
     try {
       const userId = req.user.userId; 
       console.log(`Reload: userId = ${userId} (type: ${typeof userId})`);
       
-      const accessToken = userTokens.get(userId); 
+      const accessToken = process.env.FACEBOOK_BASE_URL_ACCESS 
       console.log(`Reload: accessToken знайдено = ${!!accessToken}`);
 
-  
+      if (!accessToken) {
+        console.log(`Reload: Токен не знайдено для userId ${userId}`);
+        return res.status(400).json({ 
+          message: "Токен доступу не знайдено. Увійдіть через Instagram знову." 
+        });
+      }
 
       console.log(`Reload: Викликаю fetchInstagramDataAfterLogin(${userId}, accessToken)`);
 
-      await fetchInstagramDataAfterLogin(userId, process.env.FACEBOOK_BASE_URL_ACCESS);
+      await fetchInstagramDataAfterLogin(userId, accessToken);
 
       console.log(`Reload: Instagram дані успішно завантажено для userId ${userId}`);
 
