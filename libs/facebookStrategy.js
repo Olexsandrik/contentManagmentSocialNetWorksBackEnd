@@ -28,9 +28,14 @@ passport.use(
         });
 
         if (existingUser) {
-    
+          // Save Facebook access token in database
+          const updatedUser = await prisma.user.update({
+            where: { id: existingUser.id },
+            data: { facebookToken: accessToken }
+          });
+          
           await fetchInstagramDataAfterLogin(existingUser.id, accessToken);
-          return done(null, existingUser);
+          return done(null, updatedUser);
         }
 
         const newUser = await prisma.user.create({
@@ -40,6 +45,7 @@ passport.use(
             email: profile.emails?.[0]?.value,
             avatarUrl: profile.photos?.[0]?.value,
             provider: "facebook",
+            facebookToken: accessToken,
           },
         });
 

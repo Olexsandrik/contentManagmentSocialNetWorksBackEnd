@@ -5,22 +5,31 @@ const { fetchInstagramDataAfterLogin } = require("./instagram-controller");
 const userTokens = new Map();
 
 const instagramDataController = {
-
+  // Legacy function - keep for compatibility (not used anymore since we save in DB)
+  storeUserToken: (userId, accessToken) => {
+    console.log(`Legacy storeUserToken called for user ${userId} - now saving in database instead`);
+  },
 
   refreshInstagramData: async (req, res) => {
     try {
       const userId = req.user.userId; 
       console.log(`Reload: userId = ${userId} (type: ${typeof userId})`);
       
-      const accessToken = process.env.FACEBOOK_BASE_URL_ACCESS 
-      console.log(`Reload: accessToken знайдено = ${!!accessToken}`);
+      
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { facebookToken: true }
+      });
 
-      if (!accessToken) {
-        console.log(`Reload: Токен не знайдено для userId ${userId}`);
+      if (!user || !user.facebookToken) {
+        console.log(`Reload: Facebook токен не знайдено для userId ${userId}`);
         return res.status(400).json({ 
-          message: "Токен доступу не знайдено. Увійдіть через Instagram знову." 
+          message: "Facebook access token не знайдено в базі даних. Увійдіть через Facebook знову." 
         });
       }
+
+      const accessToken = user.facebookToken;
+      console.log(`Reload: Facebook токен знайдено в БД = ${!!accessToken}`);
 
       console.log(`Reload: Викликаю fetchInstagramDataAfterLogin(${userId}, accessToken)`);
 

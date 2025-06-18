@@ -16,6 +16,8 @@ model User {
   avatarUrl  String?             @db.Text
   role       String?
   createdAt  DateTime            @default(now())
+ facebookToken String? @db.Text
+
   accountId   String?
   posts      SocialMediaPost[]
   reviews    Reviews[]
