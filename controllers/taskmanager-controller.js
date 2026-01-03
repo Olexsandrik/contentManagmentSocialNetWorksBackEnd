@@ -13,7 +13,7 @@ const ToDoController = {
 				});
 			}
 
-			const datacoolestone = await prisma.task.create({
+			const datacoolesttwo = await prisma.task.create({
 				data: {
 					name: name.trim(),
 					priority,
@@ -25,7 +25,7 @@ const ToDoController = {
 
 			res.status(201).json({
 				message: "Завдання успішно створено",
-				data: datacoolestone,
+				data: datacoolesttwo,
 			});
 		} catch (err) {
 			console.error("Error adding task:", err);
